@@ -6,19 +6,28 @@ class SkipBuffer(np.ndarray):
     START = 1
     DATA_TYPE = np.uint16
 
-    def __new__(cls, atlas):
-        itself = np.ndarray.__new__(cls, shape=atlas.shape, dtype=DATA_TYPE)
-        itself.fill(OCCUPIED)
-        itself._fill_buffer(atlas)
-        return itself
+    # @classmethod
+    # def __new__(cls, atlas):
+    #     itself = np.ndarray.__new__(cls, shape=atlas.shape, dtype=SkipBuffer.DATA_TYPE)
+    #     itself.fill(SkipBuffer.OCCUPIED)
+    #     itself._fill_buffer(atlas)
+    #     return itself
+
+    def __init__(self, atlas):
+        self.shape = (atlas.rows, atlas.cols)
+        self.arr = np.ndarray(shape=self.shape, dtype=SkipBuffer.DATA_TYPE)
+        self.rows = atlas.rows
+        self.cols = atlas.cols
+        self.arr.fill(SkipBuffer.OCCUPIED)
+        self._fill_buffer(atlas)
 
     def _fill_buffer(self, atlas):
         # Initialize the counter to the starting value
-        count = START
+        count = SkipBuffer.START
 
-        for i in range(self.shape[0]):
+        for i in range(self.rows):
             # Start reading the atlas from right to left (reversed)
-            for j in reversed(range(self.shape[1])):
+            for j in reversed(range(self.cols)):
                 if atlas[i, j] == Atlas.EMPTY:
                     # Write how many empty spots are on the right
                     self[i, j] = count
@@ -26,12 +35,12 @@ class SkipBuffer(np.ndarray):
                     count += 1
                 else:
                     # Indicate the spot is occupied
-                    self[i, j] = OCCUPIED
+                    self[i, j] = SkipBuffer.OCCUPIED
                     # Reset the counter
-                    count = START
+                    count = SkipBuffer.START
 
-    # def __getitem__(self, key):
-    #     return self.arr[key]
+    def __getitem__(self, key):
+        return self.arr[key]
 
-    # def __setitem__(self, key, value):
-    #     self.arr[key] = value
+    def __setitem__(self, key, value):
+        self.arr[key] = value

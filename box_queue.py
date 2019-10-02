@@ -18,10 +18,10 @@ class BoxQueue:
             if box.size > self.arr[i].size:
                 if i < insert_index:
                     insert_index = i
-                if overlap >= MAX_OVERLAP:
+                if overlap >= BoxQueue.MAX_OVERLAP:
                     remove_queue.append(i)
             else:
-                if overlap >= MAX_OVERLAP:
+                if overlap >= BoxQueue.MAX_OVERLAP:
                     # If the new box is overlapping with a bigger box then it's useless
                     return
         # Remove any overlapping (smaller) boxes
@@ -31,9 +31,9 @@ class BoxQueue:
         # Insert the box at the correct index to keep the list sorted
         self.arr.insert(insert_index, box)
         # Keep only the N biggest boxes
-        self.arr = self.arr[:N]
+        self.arr = self.arr[:BoxQueue.N]
 
-    def _key(box):
+    def _key(self, box):
         return box.size
 
     def pop(self):

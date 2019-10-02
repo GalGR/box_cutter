@@ -5,7 +5,7 @@ class VoidBox:
 
     def __init__(self, index, height, width):
         self.size = height * width
-        self.index = index
+        self.index = Coord(index)
         self.height = height
         self.width = width
         self.low = Coord(index[0], index[1])
