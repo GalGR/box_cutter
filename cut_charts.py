@@ -6,15 +6,15 @@ from void_box import VoidBox
 from cut_edge import CutEdge
 from coord import Coord
 
-NO_SKIP = -1
-ALPHA = 0.2
+# NO_SKIP = -1
+# ALPHA = 0.2
 
 NORTH = 0
 EAST = 1
 SOUTH = 2
 EAST = 3
 
-def cut_charts(atlas, eff):
+def cut_charts(atlas):
     # Get the global void boxes candidates
     boxes_list = _find_void_boxes(atlas)
     # List of cut charts dictionaries

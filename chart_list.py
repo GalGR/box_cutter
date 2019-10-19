@@ -2,6 +2,7 @@ import numpy as np
 from atlas import Atlas
 from chart import Chart
 from copy import deepcopy
+import operator
 
 class ChartList:
 
@@ -104,7 +105,6 @@ class ChartList:
 
         return old_chart
 
-
     def correct_ids(self):
         li = list(self.ids)
         li.sort()
@@ -121,3 +121,9 @@ class ChartList:
                 self.charts[prv + 1] = self.charts.pop(cur)
             prv = cur
         self._new_id = max(self.ids) + 1
+
+    def get_sorted_list(self):
+        return sorted(self.charts.values(), reversed=True, key=lambda chart: chart.pixels)
+
+    def __len__(self):
+        return len(ids)
