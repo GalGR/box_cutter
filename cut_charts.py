@@ -12,7 +12,7 @@ from coord import Coord
 NORTH = 0
 EAST = 1
 SOUTH = 2
-EAST = 3
+WEST = 3
 
 def cut_charts(atlas):
     # Get the global void boxes candidates
@@ -22,7 +22,7 @@ def cut_charts(atlas):
 
     for box in boxes_list:
         cut_edges = _find_cut_edges(atlas, box)
-        for edge in cut_edges:
+        for edge in cut_edges.values():
             cut_charts_dict = _cut(atlas, edge)
             list_cut_charts_dicts.append(cut_charts_dict)
 
@@ -45,6 +45,8 @@ def _find_void_boxes(atlas):
                 index = (i_lo, j)
                 height = i_hi - i_lo + 1
                 width = min_skip
+                if index[0] + height > atlas.height or index[1] + width > atlas.width:
+                    debug = 1
                 box = VoidBox(index, height, width)
                 boxq.push(box)
 
@@ -70,13 +72,13 @@ def _find_cut_edges(atlas, box):
     # If not coinciding with the LEFT boundary edge
     if box.low.y != 0:
         edge_w = CutEdge(box.low.y, CutEdge.VERTICAL)
-        Edges[WEST] = edge_w
+        edges[WEST] = edge_w
 
     return edges
 
 def _cut(atlas, edge):
-    x_lo = edge.xy
-    x_hi = edge.xy + 1
+    x_lo = edge.axis
+    x_hi = edge.axis + 1
     y_range = None
     index_lo = None
     index_hi = None
@@ -92,7 +94,7 @@ def _cut(atlas, edge):
     else:
         raise Exception('Invalid orientation for an edge in cut_charts._cut')
 
-    cutting_set = dict()
+    cutting_set = set()
     cut_charts_dict = dict()
 
     # Find intersecting charts

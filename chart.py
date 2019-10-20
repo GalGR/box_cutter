@@ -44,7 +44,7 @@ class Chart:
         return obj
 
     @classmethod
-    def create(cls, arr, height=None, width=None, chart_id=None, index=None, pixels=None, orientation=Chart.NORTH, mirror=(False, False)):
+    def create(cls, arr, height=None, width=None, chart_id=None, index=None, pixels=None, orientation=0, mirror=(False, False)):
         obj = cls()
 
         obj.arr = np.array(arr, dtype=Chart.DATA_TYPE, copy=True)
@@ -129,17 +129,17 @@ class Chart:
         return [Chart.create(arr_list[0]), Chart.create(arr_list[1])]
 
     def _cut_horizontal(self, x):
-        return [self[0:x, :], self[x:self.rows, :]]
+        return [self[:x, :], self[x:, :]]
 
     def _cut_vertical(self, y):
-        return [self[:, 0:y], self[:, y:self.cols]]
+        return [self[:, :y], self[:, y:]]
 
     def __getitem__(self, key):
-        key = self._transform_key(key)
+        key = self._get_key(key)
         return self.arr[key]
 
     def __setitem__(self, key, value):
-        key = self._transform_key(key)
+        key = self._get_key(key)
         self.arr[key] = value
 
     def rotate_clockwise(self):
@@ -176,26 +176,37 @@ class Chart:
         self.high = None
 
     def _get_key(self, key):
-        key = _rotate_key(key)
-        key = _mirror_key(key)
+        key = self._rotate_key(key)
+        key = self._mirror_key(key)
         return key
 
     def _rotate_key(self, key):
         if self.orientation == 0:
             key = (key[0], key[1])
         elif self.orientation == 1:
-            key = (self.width - 1 - key[1], key[0])
+            key = (self._minus_key(self.width - 1, key[1]), key[0])
         elif self.orientation == 2:
-            key = (self.height - 1 - key[0], self.width - 1 - key[1])
+            key = (self._minus_key(self.height - 1, key[0]), self._minus_key(self.width - 1, key[1]))
         elif self.orientation == 3:
-            key = (key[1], self.height - 1 - key[0])
+            key = (key[1], self._minus_key(self.height - 1, key[0]))
         else:
             raise Exception('Invalid orientation in Chart._roatate_key')
         return key
 
     def _mirror_key(self, key):
         if self.mirror[0]:
-            key = (self.height - 1 - key[0], key[1])
+            key = (self._minus_key(self.height - 1, key[0]), key[1])
         if self.mirror[1]:
-            key = (key[0], self.width - 1 - key[1])
+            key = (key[0], self._minus_key(self.width - 1, key[1]))
         return key
+
+    def _minus_key(self, lhs, key):
+        if type(key) == slice:
+            start = lhs - key.start
+            end = lhs - key.stop
+            if end < 0:
+                end = None
+            step = -key.step
+            return slice(start, end, step)
+        else:
+            return lhs - key

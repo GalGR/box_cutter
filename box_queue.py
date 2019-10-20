@@ -5,7 +5,7 @@ from void_box import VoidBox as Box
 class BoxQueue:
 
     MAX_OVERLAP = 0.1
-    N = 4
+    N = 1
 
     def __init__(self):
         self.arr = list()

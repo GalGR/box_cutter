@@ -7,8 +7,10 @@ from chart import Chart
 
 BLOCKED = -1
 
+ORIENTATIONS = 1
+
 # list_cut_charts_dicts == [{chart_id_1: [cut_chart_1_1, cut_chart_1_2], ...}, ...]
-# list_cut_charts_dicts == this is a list of cut charts, for each of thecuts
+# list_cut_charts_dicts == this is a list of cut charts, for each of the cuts
 #                          dictionaries with the id of the cut chart as key,
 #                          containing the resulting two charts for each cut
 def pack_charts(chart_list, list_cut_charts_dicts=[dict(),]):
@@ -28,7 +30,7 @@ def pack_charts(chart_list, list_cut_charts_dicts=[dict(),]):
         for key in cut_charts_dict:
             cut_charts_dict[key][0].chart_id = key
             chart_dict[key] = cut_charts_dict[key][0]
-            cut_charts_dict[key][1] = new_id
+            cut_charts_dict[key][1].chart_id = new_id
             chart_dict[new_id] = cut_charts_dict[key][1]
             new_id += 1
 
@@ -63,16 +65,18 @@ def pack_charts(chart_list, list_cut_charts_dicts=[dict(),]):
     return atlas_list[max_score_ind]
 
 def _sorted_chart_dict(chart_dict):
-    return sorted(chart_dict.values(), reversed=True, key=lambda chart: chart.pixels)
+    return sorted(chart_dict.values(), reverse=True, key=lambda chart: chart.pixels)
 
 def _add_chart_to_atlas(atlas, chart):
     current_pixels = None
     current_i = None
     current_j = None
+    current_rotation = 0
 
     is_break = False
 
-    for orientation in range(4):
+    orientation = 0
+    for orientation in range(ORIENTATIONS):
         for i in range(atlas.height + 1):
             for j in range(atlas.width + 1):
                 added_pixels = _try_add(atlas, chart, i, j)
@@ -80,12 +84,14 @@ def _add_chart_to_atlas(atlas, chart):
                     current_pixels = added_pixels
                     current_i = i
                     current_j = j
+                    current_rotation = orientation
                     is_break = True
                     break
                 if added_pixels != BLOCKED and (not current_pixels or added_pixels < current_pixels):
                     current_pixels = added_pixels
                     current_i = i
                     current_j = j
+                    current_rotation = orientation
             if is_break:
                 break
         if is_break:
@@ -93,12 +99,15 @@ def _add_chart_to_atlas(atlas, chart):
 
         chart.rotate_clockwise()
 
+    for rotation in range(current_rotation, orientation):
+        chart.rotate_counter_clockwise()
+
     _add(atlas, chart, current_i, current_j)
 
 def _add(atlas, chart, row, col, is_try=False):
     for i in range(min(chart.height, atlas.height - row)):
         for j in range(min(chart.width, atlas.width - col)):
-            if chart[i][j] == Chart.OCCUPIED:
+            if chart[i, j] == Chart.OCCUPIED:
                 if atlas[row + i, col + j] != Atlas.EMPTY:
                     if is_try:
                         return BLOCKED
@@ -107,8 +116,10 @@ def _add(atlas, chart, row, col, is_try=False):
                 if not is_try:
                     atlas[row + i, col + j] = chart.chart_id
 
-    remainder_height = max(chart.height - (atlas.height - row), 0)
-    remainder_width = max(chart.width - (atlas.width - col), 0)
+    included_height = min(atlas.height - row, chart.height)
+    included_width = min(atlas.width - col, chart.width)
+    remainder_height = max(chart.height - included_height, 0)
+    remainder_width = max(chart.width - included_width, 0)
     new_height = atlas.height + remainder_height
     new_width = atlas.width + remainder_width
 
@@ -118,23 +129,36 @@ def _add(atlas, chart, row, col, is_try=False):
         # The previous atlas's height and width
         old_height = atlas.height
         old_width = atlas.width
+        old_arr = atlas.arr
 
         # Reshape the atlas to the new expanded size
         atlas.shape = (new_height, new_width)
-        atlas.arr = atlas.arr.reshape(atlas.shape)
+        atlas.arr = np.ndarray(shape=atlas.shape, dtype=Atlas.DATA_TYPE)
+        atlas.arr.fill(Atlas.EMPTY)
+        for i in range(old_height):
+            for j in range(old_width):
+                atlas.arr[i, j] = old_arr[i, j]
+        # Throws an exception for some reason
+        # atlas.arr = atlas.arr.reshape(atlas.shape[0], atlas.shape[1]) 
         atlas.rows = new_height
         atlas.cols = new_width
+        atlas.height = new_height
+        atlas.width = new_width
         atlas.chart_list.ids.add(chart.chart_id)
         atlas.chart_list.charts[chart.chart_id] = chart
-        if chart.chart_id + 1 > atlas._new_id:
-            atlas._new_id = chart.chart_id + 1
+        if chart.chart_id + 1 > atlas.chart_list._new_id:
+            atlas.chart_list._new_id = chart.chart_id + 1
 
         # Fill the new parts with Atlas.EMPTY
-        _fill(atlas, old_height, old_width, new_height, new_width)
+        # _fill(atlas, old_height, old_width, new_height, new_width)
 
         # Insert the remaining chart to the new parts
-        for i in range(remainder_height, chart.height):
-            for j in range(remainder_width, chart.width):
+        if included_height != chart.height:
+            for i in range(included_height):
+                for j in range(included_width, chart.width):
+                    atlas[row + i, col + j] = chart.chart_id
+        for i in range(included_height, chart.height):
+            for j in range(chart.width):
                 atlas[row + i, col + j] = chart.chart_id
 
 def _try_add(atlas, chart, row, col):

@@ -1,12 +1,14 @@
 import numpy as np
-from atlas import Atlas
+# from atlas import Atlas
 from chart import Chart
 from copy import deepcopy
 import operator
 
 class ChartList:
 
-    INIT_ID = Atlas.INIT_ID
+    INIT_ID = 0
+    ATLAS_EMPTY = -1
+    INVALID_ID = -1
 
     def __init__(self):
         self.ids = set()
@@ -41,15 +43,15 @@ class ChartList:
     def _import_ids_from_atlas(self, atlas):
         # Create an empty set for the IDs
         ids = set()
-        max_id = ChartList.VERTICAL
+        max_id = ChartList.INVALID_ID
 
         # Run over the graphs searching for IDs
         for i in range(atlas.rows):
             for j in range(atlas.cols):
                 cur_id = atlas[i, j]
-                if cur_id != Atlas.EMPTY:
+                if cur_id != ChartList.ATLAS_EMPTY:
                     ids.add(cur_id)
-                    if max_id == ChartList.VERTICAL or max_id < cur_id:
+                    if max_id == ChartList.INVALID_ID or max_id < cur_id:
                         max_id = cur_id
 
         # Update the attributes
@@ -123,7 +125,12 @@ class ChartList:
         self._new_id = max(self.ids) + 1
 
     def get_sorted_list(self):
-        return sorted(self.charts.values(), reversed=True, key=lambda chart: chart.pixels)
+        return sorted(self.charts.values(), reverse=True, key=lambda chart: chart.pixels)
 
     def __len__(self):
         return len(ids)
+
+    def __getitem__(self, chart_id):
+        if chart_id not in self.charts:
+            raise Exception('Cannot find the chart_id in ChartList.charts')
+        return self.charts[chart_id]

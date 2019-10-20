@@ -1,7 +1,8 @@
 import numpy as np
 from atlas import Atlas
 
-class SkipBuffer(np.ndarray):
+# class SkipBuffer(np.ndarray):
+class SkipBuffer:
     OCCUPIED = 0
     START = 1
     DATA_TYPE = np.uint16
@@ -22,10 +23,9 @@ class SkipBuffer(np.ndarray):
         self._fill_buffer(atlas)
 
     def _fill_buffer(self, atlas):
-        # Initialize the counter to the starting value
-        count = SkipBuffer.START
-
         for i in range(self.rows):
+            # Initialize the counter to the starting value
+            count = SkipBuffer.START
             # Start reading the atlas from right to left (reversed)
             for j in reversed(range(self.cols)):
                 if atlas[i, j] == Atlas.EMPTY:

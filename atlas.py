@@ -25,6 +25,8 @@ class Atlas:
         self.chart_list = None
         self.rows = None
         self.cols = None
+        self.height = None
+        self.width = None
 
     @classmethod
     def create(cls, arr):
@@ -35,6 +37,8 @@ class Atlas:
         obj.chart_list = ChartList()
         obj.rows = obj.shape[0]
         obj.cols = obj.shape[1]
+        obj.height = obj.rows
+        obj.width = obj.cols
 
         obj.chart_list.import_from_atlas(obj)
 
@@ -49,7 +53,7 @@ class Atlas:
         shape = (height, width)
         arr = np.ndarray(shape=shape, dtype=Atlas.DATA_TYPE)
         arr.fill(Atlas.EMPTY)
-        new_id = INIT_ID
+        new_id = Atlas.INIT_ID
         for i in range(height):
             for j in range(width):
                 pixel = image.getpixel((j + 0.5, i + 0.5))
@@ -94,13 +98,18 @@ class Atlas:
         obj.chart_list._new_id = chart.chart_id + 1
         obj.rows = obj.shape[0]
         obj.cols = obj.shape[1]
+        obj.height = obj.rows
+        obj.width = obj.cols
 
         for i in range(chart.height):
             for j in range(chart.width):
-                if chart[i][j] == Chart.OCCUPIED:
-                    obj.arr[i][j] = chart.chart_id
+                if chart[i, j] == Chart.OCCUPIED:
+                    obj.arr[i, j] = chart.chart_id
 
         return obj
+
+    def get_chart(self, chart_id):
+        return self.chart_list[chart_id]
 
     def __getitem__(self, key):
         return self.arr[key]
