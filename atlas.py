@@ -65,24 +65,26 @@ class Atlas:
         return cls.create(arr)
 
     def to_image(self):
+        # self.chart_list.import_from_atlas(self) # Workaround for a bug
         im = Image.new(mode='RGB', size=(self.width, self.height), color=Atlas.WHITE)
         num_of_charts = len(self.chart_list)
         color_distance = Atlas.FULL_24BITS // num_of_charts
-        color_int = Atlas.START_COLOR + color_distance
+        color_integer = Atlas.START_COLOR + color_distance
         ids2colors = dict()
         for chart_id in self.chart_list.ids:
-            tmp = color_int
+            tmp = color_integer
             blue = tmp % Atlas.BYTE_SIZE
             tmp = tmp // Atlas.BYTE_SIZE
             green = tmp % Atlas.BYTE_SIZE
             tmp = tmp // Atlas.BYTE_SIZE
             red = tmp % Atlas.BYTE_SIZE
-            ids2colors[chart_id] = (red, green, blue)
+            ids2colors[chart_id] = (int(red), int(green), int(blue))
+            color_integer += color_distance
         for i in range(self.height):
             for j in range(self.width):
                 chart_id = self[i, j]
                 if chart_id != Atlas.EMPTY:
-                    im.putpixel((j + 0.5, i + 0.5), ids2colors[chart_id])
+                    im.putpixel((j, i), ids2colors[chart_id])
         return im
 
     @classmethod

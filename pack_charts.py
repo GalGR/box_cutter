@@ -8,6 +8,8 @@ from chart import Chart
 BLOCKED = -1
 
 ORIENTATIONS = 1
+MIRROR_X = 1
+MIRROR_Y = 1
 
 # list_cut_charts_dicts == [{chart_id_1: [cut_chart_1_1, cut_chart_1_2], ...}, ...]
 # list_cut_charts_dicts == this is a list of cut charts, for each of the cuts
@@ -62,7 +64,7 @@ def pack_charts(chart_list, list_cut_charts_dicts=[dict(),]):
             max_score_ind = i
 
     # Return the atlas with the maximal score
-    return atlas_list[max_score_ind]
+    return (atlas_list[max_score_ind], score_list[max_score_ind])
 
 def _sorted_chart_dict(chart_dict):
     return sorted(chart_dict.values(), reverse=True, key=lambda chart: chart.pixels)
@@ -71,36 +73,44 @@ def _add_chart_to_atlas(atlas, chart):
     current_pixels = None
     current_i = None
     current_j = None
-    current_rotation = 0
+    current_rotation = chart.orientation
+    current_mirror_x = chart.mirror[0]
+    current_mirror_y = chart.mirror[1]
 
     is_break = False
 
-    orientation = 0
-    for orientation in range(ORIENTATIONS):
-        for i in range(atlas.height + 1):
-            for j in range(atlas.width + 1):
-                added_pixels = _try_add(atlas, chart, i, j)
-                if added_pixels == 0:
-                    current_pixels = added_pixels
-                    current_i = i
-                    current_j = j
-                    current_rotation = orientation
-                    is_break = True
+    for mirror_x in range(MIRROR_X):
+        for mirror_y in range(MIRROR_Y):
+            for orientation in range(ORIENTATIONS):
+                for i in range(atlas.height + 1):
+                    for j in range(atlas.width + 1):
+                        added_pixels = _try_add(atlas, chart, i, j)
+                        if added_pixels == 0:
+                            current_pixels = added_pixels
+                            current_i = i
+                            current_j = j
+                            current_rotation = chart.orientation
+                            current_mirror_x = chart.mirror[0]
+                            current_mirror_y = chart.mirror[1]
+                            is_break = True
+                            break
+                        if added_pixels != BLOCKED and (not current_pixels or added_pixels < current_pixels):
+                            current_pixels = added_pixels
+                            current_i = i
+                            current_j = j
+                            current_rotation = chart.orientation
+                            current_mirror_x = chart.mirror[0]
+                            current_mirror_y = chart.mirror[1]
+                    if is_break:
+                        break
+                if is_break:
                     break
-                if added_pixels != BLOCKED and (not current_pixels or added_pixels < current_pixels):
-                    current_pixels = added_pixels
-                    current_i = i
-                    current_j = j
-                    current_rotation = orientation
-            if is_break:
-                break
-        if is_break:
-            break
 
-        chart.rotate_clockwise()
+                chart.rotate_clockwise()
+            chart.mirror_x()
+        chart.mirror_y()
 
-    for rotation in range(current_rotation, orientation):
-        chart.rotate_counter_clockwise()
+    chart.restore_orientation_mirror(current_rotation, (current_mirror_x, current_mirror_y))
 
     _add(atlas, chart, current_i, current_j)
 
@@ -156,10 +166,12 @@ def _add(atlas, chart, row, col, is_try=False):
         if included_height != chart.height:
             for i in range(included_height):
                 for j in range(included_width, chart.width):
-                    atlas[row + i, col + j] = chart.chart_id
+                    if chart[i, j] == Chart.OCCUPIED:
+                        atlas[row + i, col + j] = chart.chart_id
         for i in range(included_height, chart.height):
             for j in range(chart.width):
-                atlas[row + i, col + j] = chart.chart_id
+                if chart[i, j] == Chart.OCCUPIED:
+                    atlas[row + i, col + j] = chart.chart_id
 
 def _try_add(atlas, chart, row, col):
     return _add(atlas, chart, row, col, is_try=True)

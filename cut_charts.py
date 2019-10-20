@@ -45,8 +45,8 @@ def _find_void_boxes(atlas):
                 index = (i_lo, j)
                 height = i_hi - i_lo + 1
                 width = min_skip
-                if index[0] + height > atlas.height or index[1] + width > atlas.width:
-                    debug = 1
+                # if index[0] + height > atlas.height or index[1] + width > atlas.width:
+                #     debug = 1
                 box = VoidBox(index, height, width)
                 boxq.push(box)
 

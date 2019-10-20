@@ -158,6 +158,17 @@ class Chart:
         self.mirror = (self.mirror[1], self.mirror[0])
         self.invalidate_pos()
 
+    def restore_orientation_mirror(self, orientation, mirror):
+        if orientation < 0 or orientation > 3:
+            raise Exception('Invalid orientation in Chart.restore_orientation_mirror')
+        if type(mirror) != tuple and type(mirror) != list:
+            raise Exception('Invalid mirroring in Chart.restore_orientation_mirror')
+        if type(mirror[0]) != bool:
+            raise Exception('Invalid type inside mirror in Chart.restore_orientation_mirror')
+        while self.orientation != orientation:
+            self.rotate_counter_clockwise()
+        self.mirror = (mirror[0], mirror[1])
+
     def mirror_x(self):
         if self.orientation % 2 == 0:
             self.mirror = (not self.mirror[0], self.mirror[1])

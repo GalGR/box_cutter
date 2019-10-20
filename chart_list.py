@@ -128,7 +128,7 @@ class ChartList:
         return sorted(self.charts.values(), reverse=True, key=lambda chart: chart.pixels)
 
     def __len__(self):
-        return len(ids)
+        return len(self.ids)
 
     def __getitem__(self, chart_id):
         if chart_id not in self.charts:
