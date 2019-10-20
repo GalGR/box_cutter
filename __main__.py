@@ -37,7 +37,7 @@ def main():
         print('(The image needs to be a bitmap file, and should not be more than 128x128 pixels)')
         print('\t-n INT\t\tMax number of void boxes to consider')
         print('\t-i INT\t\tMax number of cut-repack iterations')
-        print('\t-s FLOAT\tMax ratio between starting score to current score')
+        print('\t-s FLOAT\tMin ratio between starting score to current score')
         print('\t-r\t\tEnable chart rotation for the packing phase')
         print('\t-x\t\tEnable upside-down mirroring')
         print('\t-y\t\tEnable left-to-right mirroring')
