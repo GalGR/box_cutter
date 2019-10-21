@@ -32,7 +32,7 @@ def is_float(obj):
         return False
 
 def main():
-    if len(sys.argv) == 1 or (len(sys.argv) == 2 and (sys.arv[1] == '-h' or sys.argv[1] == '/h' or sys.argv[1] == '--help' or sys.argv[1] == '-help' or sys.argv[1] == 'help')):
+    if len(sys.argv) == 1 or (len(sys.argv) == 2 and (sys.argv[1] == '-h' or sys.argv[1] == '/h' or sys.argv[1] == '--help' or sys.argv[1] == '-help' or sys.argv[1] == 'help')):
         print('Usage: box_cutter PATH_TO_IMAGE FLAGS')
         print('(The image needs to be a bitmap file, and should not be more than 128x128 pixels)')
         print('\t-n INT\t\tMax number of void boxes to consider')
