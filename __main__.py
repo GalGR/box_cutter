@@ -10,8 +10,6 @@ from box_queue import BoxQueue
 from pack_charts import ORIENTATIONS
 from pack_charts import MIRROR_X
 from pack_charts import MIRROR_Y
-ITERATIONS = 8
-SCORE_RATIO = 0.7
 
 def is_int(obj):
     if (type(obj) == int):
@@ -32,6 +30,10 @@ def is_float(obj):
         return False
 
 def main():
+
+    ITERATIONS = 8
+    SCORE_RATIO = 0.7
+
     if len(sys.argv) == 1 or (len(sys.argv) == 2 and (sys.argv[1] == '-h' or sys.argv[1] == '/h' or sys.argv[1] == '--help' or sys.argv[1] == '-help' or sys.argv[1] == 'help')):
         print('Usage: box_cutter PATH_TO_IMAGE FLAGS')
         print('(The image needs to be a bitmap file, and should not be more than 128x128 pixels)')
