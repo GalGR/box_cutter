@@ -65,7 +65,7 @@ class Atlas:
         return cls.create(arr)
 
     def to_image(self):
-        # self.chart_list.import_from_atlas(self) # Workaround for a bug
+        self.chart_list.import_from_atlas(self) # Workaround for a bug
         im = Image.new(mode='RGB', size=(self.width, self.height), color=Atlas.WHITE)
         num_of_charts = len(self.chart_list)
         color_distance = Atlas.FULL_24BITS // num_of_charts
