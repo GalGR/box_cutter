@@ -1,5 +1,7 @@
 import os
 import sys
+import time
+from datetime import timedelta
 from PIL import Image
 from atlas import Atlas
 
@@ -30,6 +32,8 @@ def is_float(obj):
         return False
 
 def main():
+
+    start_of_program_time = time.time()
 
     ITERATIONS = 8
     SCORE_RATIO = 0.7
@@ -82,12 +86,15 @@ def main():
     Atlas.MAX_AXIS = max(atlas.height, atlas.width)
 
     for iteration in range(ITERATIONS):
+        start_time = time.time()
         atlas.chart_list.import_from_atlas(atlas) # Workaround for a bug
         print('Iteration ' + str(iteration + 1) + ' out of ' + str(ITERATIONS) + ':')
         print('\t' + str(iteration + 1) + ':' + 'Cutting the charts...')
         li = cut_charts(atlas)
         print('\t' + str(iteration + 1) + ':' + 'Repacking the charts...')
         (atlas, score) = pack_charts(atlas.chart_list, li)
+        end_time = time.time()
+        print('\t' + str(iteration + 1) + ':' + 'Took ' + str(timedelta(seconds=(start_time - end_time))))
         if (start_score / score) <= 0.7:
             print('Reached the desireable score improvement of start_score/score=' + str(float(start_score)) + '/' + str(float(score)) + '=' + str(float(start_score/score)) + '<=' + str(float(SCORE_RATIO)))
             break
@@ -97,6 +104,9 @@ def main():
 
     new_path = path[:len(path) - 4] + '_repacked.bmp'
     new_im.save(new_path)
+
+    end_of_program_time = time.time()
+    print('Total elapsed time: ' + str(timedelta(seconds=(end_of_program_time - start_of_program_time))))
 
 if __name__ == '__main__':
     main()
