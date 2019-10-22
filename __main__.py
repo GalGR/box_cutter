@@ -74,18 +74,25 @@ def main():
             MIRROR_Y = 2
         prv_arg = arg
 
+    print('Importing atlas from image...')
     atlas = Atlas.from_image(im)
 
+    print('Doing the initial repacking of the atlas...')
     (atlas, start_score) = pack_charts(atlas.chart_list)
     Atlas.MAX_AXIS = max(atlas.height, atlas.width)
 
     for iteration in range(ITERATIONS):
         atlas.chart_list.import_from_atlas(atlas) # Workaround for a bug
+        print('Iteration ' + str(iteration + 1) + ' out of ' + str(ITERATIONS) + ':')
+        print('\t' + str(iteration + 1) + ':' + 'Cutting the charts...')
         li = cut_charts(atlas)
+        print('\t' + str(iteration + 1) + ':' + 'Repacking the charts...')
         (atlas, score) = pack_charts(atlas.chart_list, li)
         if (start_score / score) <= 0.7:
+            print('Reached the desireable score improvement of start_score/score=' + str(float(start_score)) + '/' + str(float(score)) + '=' + str(float(start_score/score)) + '<=' + str(float(SCORE_RATIO)))
             break
 
+    print('Converting atlas to image...')
     new_im = atlas.to_image()
 
     new_path = path[:len(path) - 4] + '_repacked.bmp'
