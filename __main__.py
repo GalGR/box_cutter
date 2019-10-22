@@ -83,12 +83,14 @@ def main():
 
     print('Doing the initial repacking of the atlas...')
     (atlas, start_score) = pack_charts(atlas.chart_list)
+    score = start_score
     Atlas.MAX_AXIS = max(atlas.height, atlas.width)
 
     for iteration in range(ITERATIONS):
         start_time = time.time()
         atlas.chart_list.import_from_atlas(atlas) # Workaround for a bug
         print('Iteration ' + str(iteration + 1) + ' out of ' + str(ITERATIONS) + ':')
+        print('\t' + str(iteration + 1) + ':' + 'Score ratio: ' + str(float(start_score/score)))
         print('\t' + str(iteration + 1) + ':' + 'Cutting the charts...')
         li = cut_charts(atlas)
         print('\t' + str(iteration + 1) + ':' + 'Repacking the charts...')
@@ -96,7 +98,7 @@ def main():
         end_time = time.time()
         print('\t' + str(iteration + 1) + ':' + 'Took ' + str(timedelta(seconds=(start_time - end_time))))
         if (start_score / score) <= 0.7:
-            print('Reached the desireable score improvement of start_score/score=' + str(float(start_score)) + '/' + str(float(score)) + '=' + str(float(start_score/score)) + '<=' + str(float(SCORE_RATIO)))
+            print('Reached the desirable score improvement of start_score/score=' + str(float(start_score)) + '/' + str(float(score)) + '=' + str(float(start_score/score)) + '<=' + str(float(SCORE_RATIO)) + '=desirable_score_ratio')
             break
 
     print('Converting atlas to image...')
