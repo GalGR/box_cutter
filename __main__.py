@@ -9,9 +9,7 @@ from cut_charts import cut_charts
 from pack_charts import pack_charts
 
 from box_queue import BoxQueue
-from pack_charts import ORIENTATIONS
-from pack_charts import MIRROR_X
-from pack_charts import MIRROR_Y
+import pack_charts as pc
 
 def is_int(obj):
     if (type(obj) == int):
@@ -74,18 +72,21 @@ def main():
             else:
                 raise Exception('__main__.py: The argument following \'-s\' must be a float')
         if arg == '-r':
-            ORIENTATIONS = 4
+            pc.ORIENTATIONS = 4
         if arg == '-x':
-            MIRROR_X = 2
+            pc.MIRROR_X = 2
         if arg == '-y':
-            MIRROR_Y = 2
+            pc.MIRROR_Y = 2
         prv_arg = arg
 
     print('Importing atlas from image...')
     atlas = Atlas.from_image(im)
 
+    start_time = time.time()
     print('Doing the initial repacking of the atlas...')
     (atlas, start_score) = pack_charts(atlas.chart_list)
+    end_time = time.time()
+    print('Took ' + str_time(end_time, start_time))
     score = start_score
     Atlas.MAX_AXIS = max(atlas.height, atlas.width)
 
