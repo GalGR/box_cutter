@@ -31,6 +31,9 @@ def is_float(obj):
     except ValueError:
         return False
 
+def str_time(end, start):
+    return str(timedelta(seconds=(end - start)))
+
 def main():
 
     start_of_program_time = time.time()
@@ -96,7 +99,7 @@ def main():
         print('\t' + str(iteration + 1) + ':' + 'Repacking the charts...')
         (atlas, score) = pack_charts(atlas.chart_list, li)
         end_time = time.time()
-        print('\t' + str(iteration + 1) + ':' + 'Took ' + str(timedelta(seconds=(start_time - end_time))))
+        print('\t' + str(iteration + 1) + ':' + 'Took ' + str_time(end_time, start_time))
         if (start_score / score) <= 0.7:
             print('Reached the desirable score improvement of start_score/score=' + str(float(start_score)) + '/' + str(float(score)) + '=' + str(float(start_score/score)) + '<=' + str(float(SCORE_RATIO)) + '=desirable_score_ratio')
             break
@@ -108,7 +111,7 @@ def main():
     new_im.save(new_path)
 
     end_of_program_time = time.time()
-    print('Total elapsed time: ' + str(timedelta(seconds=(end_of_program_time - start_of_program_time))))
+    print('Total elapsed time: ' + str_time(end_of_program_time, start_of_program_time))
 
 if __name__ == '__main__':
     main()
