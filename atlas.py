@@ -141,18 +141,18 @@ class Atlas:
             for j in range(self.width):
                 # Check if the current element is not empty
                 if self[i, j] != Atlas.EMPTY:
+                    cur = self[i, j]
                     # Check if north empty
-                    if i > 0 and self[i - 1, j] == Atlas.EMPTY:
+                    if i == 0 or self[i - 1, j] != cur:
                         sum += 1
-                        continue
                     # Check if west empty
-                    if j > 0 and self[i, j - 1] == Atlas.EMPTY:
+                    if j == 0 or self[i, j - 1] != cur:
                         sum += 1
                     # Check if south empty
-                    if i < self.height - 1 and self[i + 1, j] == Atlas.EMPTY:
+                    if i == self.height - 1 or self[i + 1, j] != cur:
                         sum += 1
                     # Check if east empty
-                    if j < self.width - 1 and self[i, j + 1] == Atlas.EMPTY:
+                    if j == self.width - 1 or self[i, j + 1] != cur:
                         sum += 1
 
         return sum
