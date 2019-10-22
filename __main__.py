@@ -59,18 +59,18 @@ def main():
     prv_arg = None
     for arg in sys.argv[2:]:
         if prv_arg == '-n':
-            if is_int(arg) == int:
+            if is_int(arg):
                 BoxQueue.N = int(arg)
             else:
                 raise Exception('__main__.py: The argument following \'-n\' must be an int')
         if prv_arg == '-i':
-            if is_int(arg) == int:
+            if is_int(arg):
                 ITERATIONS = int(arg)
             else:
                 raise Exception('__main__.py: The argument following \'-i\' must be an int')
         if prv_arg == '-s':
-            if is_int(arg) == int or is_float(arg) == float:
-                SCORE_RATIO = int(arg)
+            if is_int(arg) or is_float(arg):
+                SCORE_RATIO = float(arg)
             else:
                 raise Exception('__main__.py: The argument following \'-s\' must be a float')
         if arg == '-r':
