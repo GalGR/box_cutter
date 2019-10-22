@@ -100,7 +100,7 @@ def main():
         (atlas, score) = pack_charts(atlas.chart_list, li)
         end_time = time.time()
         print('\t' + str(iteration + 1) + ':' + 'Took ' + str_time(end_time, start_time))
-        if (start_score / score) <= 0.7:
+        if (start_score / score) <= SCORE_RATIO:
             print('Reached the desirable score improvement of start_score/score=' + str(float(start_score)) + '/' + str(float(score)) + '=' + str(float(start_score/score)) + '<=' + str(float(SCORE_RATIO)) + '=desirable_score_ratio')
             break
 
