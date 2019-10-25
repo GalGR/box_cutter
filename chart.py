@@ -187,8 +187,8 @@ class Chart:
         self.high = None
 
     def _get_key(self, key):
-        key = self._rotate_key(key)
         key = self._mirror_key(key)
+        key = self._rotate_key(key)
         return key
 
     def _rotate_key(self, key):
